@@ -35,7 +35,7 @@ def get_books(db: Session = Depends(get_db)):
 # Read one book
 @app.get("/books/{book_id}", response_model=Book)
 def get_book(book_id: int, db: Session = Depends(get_db)):
-    book_db = db.query(BookDB).filter(Book.id == book_id).first()
+    book_db = db.query(BookDB).filter(BookDB.id == book_id).first()
     if not book_db:
         raise HTTPException(status_code=404, detail="Book not found")
     return book_db
@@ -43,12 +43,14 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
 #Update a book
 @app.put("/books/{book_id}", response_model=Book)
 def update_book(book_id: int, book: BookCreate, db: Session = Depends(get_db)):
-    db_book = db.query(Book).filter(Book.id == book_id).first()
+    db_book = db.query(BookDB).filter(BookDB.id == book_id).first()
     if not db_book:
         raise HTTPException(status_code=404, detail="Book not found")
+    
     db_book.title = book.title
     db_book.author = book.author
     db_book.description = book.description
+    
     db.commit()
     db.refresh(db_book)
     return db_book
